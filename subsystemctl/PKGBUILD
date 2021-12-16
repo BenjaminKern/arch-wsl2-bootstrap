@@ -1,0 +1,23 @@
+# Maintainer: Sorah Fukumori <her@sorah.jp>
+pkgname=subsystemctl
+pkgver=0.2.0
+pkgrel=1
+pkgdesc="Run systemd in WSL2"
+arch=('x86_64' 'aarch64')
+url="https://github.com/sorah/subsystemctl"
+license=('MIT')
+makedepends=('cargo')
+source=(
+  "https://github.com/sorah/subsystemctl/archive/v${pkgver}.tar.gz"
+)
+
+build() {
+  cd "subsystemctl-$pkgver"
+  cargo build --release --locked --all-features
+}
+
+package() {
+  cd "subsystemctl-$pkgver"
+  install -Dm6755 target/release/subsystemctl "${pkgdir}/usr/bin/subsystemctl"
+}
+sha512sums=('f5e1290c32b8748436cb025d61f27335e26c9960e9a5b9d67c9b2a0f2b322c078a60c7a38a549a5a2c2549b046c214c638893471e93b310d332b8cbf05ded68c')
