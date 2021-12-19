@@ -37,28 +37,23 @@ if [[ ${EUID} -ne 0 ]]; then
 fi
 
 DESTDIR=rootfs
-BOOTSTRAP_VERSION=2021.12.01
-ARCH_CHROOT_BIN=/tmp/root.x86_64/bin/arch-chroot
-ARCH_PACSTRAP_BIN=/tmp/root.x86_64/bin/pacstrap
-
-curl -sL http://mirror.rackspace.com/archlinux/iso/latest/archlinux-bootstrap-${BOOTSTRAP_VERSION}-x86_64.tar.gz | tar xfz - --numeric-owner -C /tmp/
 
 mkdir -p ${DESTDIR}
-${ARCH_PACSTRAP_BIN} -c -G -M ${DESTDIR} base
-${ARCH_PACSTRAP_BIN} -c -G -M -U ${DESTDIR} subsystemctl/subsystemctl-0.2.0-1-x86_64.pkg.tar.zst
+pacstrap -c -G -M ${DESTDIR} base
+pacstrap -c -G -M -U ${DESTDIR} subsystemctl/subsystemctl-0.2.0-1-x86_64.pkg.tar.zst
 sed -i -e "s/#en_US.UTF-8/en_US.UTF-8/" ${DESTDIR}/etc/locale.gen
 sed -i -e "/hosteurope/s/^#//g" ${DESTDIR}/etc/pacman.d/mirrorlist
 echo "LANG=en_US.UTF-8" > ${DESTDIR}/etc/locale.conf
 echo "KEYMAP=de-latin1" > ${DESTDIR}/etc/vconsole.conf
-${ARCH_CHROOT_BIN} ${DESTDIR} locale-gen
-${ARCH_PACSTRAP_BIN} -c -G -M ${DESTDIR} docker sudo git
-${ARCH_CHROOT_BIN} ${DESTDIR} pacman-key --init
-${ARCH_CHROOT_BIN} ${DESTDIR} pacman-key --populate archlinux
-${ARCH_CHROOT_BIN} ${DESTDIR} groupadd --gid ${GROUP_ID} ${USERNAME}
-${ARCH_CHROOT_BIN} ${DESTDIR} useradd -c "" --no-log-init -u ${USER_ID} -g ${GROUP_ID} -m -G docker ${USERNAME}
-${ARCH_CHROOT_BIN} ${DESTDIR} systemctl enable docker.service
-${ARCH_CHROOT_BIN} ${DESTDIR} passwd ${USERNAME}
-${ARCH_CHROOT_BIN} ${DESTDIR} passwd -l root
+arch-chroot ${DESTDIR} locale-gen
+pacstrap -c -G -M ${DESTDIR} docker sudo git
+arch-chroot ${DESTDIR} pacman-key --init
+arch-chroot ${DESTDIR} pacman-key --populate archlinux
+arch-chroot ${DESTDIR} groupadd --gid ${GROUP_ID} ${USERNAME}
+arch-chroot ${DESTDIR} useradd -c "" --no-log-init -u ${USER_ID} -g ${GROUP_ID} -m -G docker ${USERNAME}
+arch-chroot ${DESTDIR} systemctl enable docker.service
+arch-chroot ${DESTDIR} passwd ${USERNAME}
+arch-chroot ${DESTDIR} passwd -l root
 echo "${USERNAME} ALL=(ALL) ALL" > ${DESTDIR}/etc/sudoers.d/${USERNAME}
 echo 'Defaults env_keep += "ftp_proxy http_proxy https_proxy no_proxy"' >> ${DESTDIR}/etc/sudoers
 pushd ${DESTDIR} > /dev/null
