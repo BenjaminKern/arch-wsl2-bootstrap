@@ -40,7 +40,6 @@ DESTDIR=rootfs
 
 mkdir -p ${DESTDIR}
 pacstrap -c -G -M ${DESTDIR} base
-pacstrap -c -G -M -U ${DESTDIR} subsystemctl/subsystemctl-0.2.0-1-x86_64.pkg.tar.zst
 sed -i -e "s/#en_US.UTF-8/en_US.UTF-8/" ${DESTDIR}/etc/locale.gen
 sed -i -e "/hosteurope/s/^#//g" ${DESTDIR}/etc/pacman.d/mirrorlist
 echo "LANG=en_US.UTF-8" > ${DESTDIR}/etc/locale.conf
@@ -59,4 +58,5 @@ echo 'Defaults env_keep += "ftp_proxy http_proxy https_proxy no_proxy"' >> ${DES
 pushd ${DESTDIR} > /dev/null
 tar -zcpf ../rootfs.tar.gz *
 popd > /dev/null
-echo "RUN via: wsl -d DISTRONAME -u root -- subsystemctl shell --start --uid=${USER_ID}"
+# TODO: generate /etc/wsl.conf entries
+echo "RUN via: wsl -d DISTRONAME --cd ~"
